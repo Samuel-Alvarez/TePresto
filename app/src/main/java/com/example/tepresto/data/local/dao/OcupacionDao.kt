@@ -3,7 +3,6 @@ package com.example.tepresto.data.local.dao
 import androidx.room.*
 import com.example.tepresto.data.local.entity.OcupacionEntity
 import kotlinx.coroutines.flow.Flow
-
 @Dao
 interface OcupacionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -20,8 +19,12 @@ interface OcupacionDao {
     """)
     suspend fun find(ocupacionId: Int): OcupacionEntity?
 
-    @Query("SELECT * FROM Ocupaciones")
+    @Query("""SELECT * 
+        FROM Ocupaciones
+        ORDER BY ocupacionId desc
+    """)
     fun getList(): Flow<List<OcupacionEntity>>
+
 
 }
 
