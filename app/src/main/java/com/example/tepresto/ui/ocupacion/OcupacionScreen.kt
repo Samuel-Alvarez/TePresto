@@ -9,9 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tepresto.data.local.entity.OcupacionEntity
+import com.example.tepresto.data.remote.dto.ArticuloDto
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,7 +24,9 @@ fun OcupacionScreen(viewModel: OcupacionViewModel = hiltViewModel()) {
         OcupacionBody(viewModel)
 
         val uiState by viewModel.uiState.collectAsState()
-        OcupacionListScreen(uiState.ocupacionesList)
+        //OcupacionListScreen(uiState.ocupacionesList)
+
+        ArticuloListScreen(uiState.articulosList)
     }
 }
 
@@ -38,7 +42,7 @@ private fun OcupacionBody(
                 .padding(8.dp)
                 .fillMaxWidth(),
             value = viewModel.descripcion,
-            onValueChange = {  viewModel.descripcion = it },
+            onValueChange = { viewModel.descripcion = it },
             label = { Text("Descripción") }
         )
 
@@ -70,6 +74,34 @@ private fun OcupacionListScreen(ocupacionList: List<OcupacionEntity>) {
         }
     }
 }
+
+@Composable
+fun ArticuloListScreen(articulos: List<ArticuloDto>) {
+    LazyColumn() {
+        items(articulos) { art ->
+            ArticuloRow(art)
+        }
+    }
+}
+
+@Composable
+fun ArticuloRow(articuloDto: ArticuloDto) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(text = articuloDto.descripcion, style = MaterialTheme.typography.titleLarge)
+        Text(text = articuloDto.precio.toString())
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun ArticuloListScreenPreview() {
+    var articulos = listOf(
+        ArticuloDto(1, "Disco ssd", "", 100.0, 1),
+        ArticuloDto(1, "Camara", "", 200.0, 1)
+    )
+    ArticuloListScreen(articulos)
+}
+
 @Composable
 private fun OcupacionRow(ocupacion: OcupacionEntity) {
     Column(

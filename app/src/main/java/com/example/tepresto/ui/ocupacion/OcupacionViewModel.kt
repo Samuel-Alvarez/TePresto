@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.runtime.*
 import com.example.tepresto.data.local.entity.OcupacionEntity
+import com.example.tepresto.data.remote.TodoApi
+import com.example.tepresto.data.remote.dto.ArticuloDto
 import com.example.tepresto.data.repository.OcupacionRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,12 +20,14 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 
 data class OcupacionUiState(
-    val ocupacionesList: List<OcupacionEntity> = emptyList()
+    val ocupacionesList: List<OcupacionEntity> = emptyList(),
+    val articulosList: List<ArticuloDto> = emptyList()
 )
 
 @HiltViewModel
 class OcupacionViewModel @Inject constructor(
-    private val ocupacionRepository: OcupacionRepository
+    private val ocupacionRepository: OcupacionRepository,
+    private val todoApi: TodoApi
 ) : ViewModel() {
 
     var descripcion by mutableStateOf("")
@@ -38,10 +42,22 @@ class OcupacionViewModel @Inject constructor(
 
     fun getLista() {
         viewModelScope.launch(Dispatchers.IO) {
-            ocupacionRepository.getList().collect{lista ->
-                uiState.update {
-                    it.copy(ocupacionesList = lista)
-                }
+            //refrescarOcupaciones()
+            getArticulosFromApi()
+        }
+    }
+
+    private  suspend fun getArticulosFromApi(){
+        val articulos = todoApi.getList()
+        uiState.update {
+            it.copy(articulosList = articulos)
+        }
+    }
+
+    private suspend fun refrescarOcupaciones() {
+        ocupacionRepository.getList().collect { lista ->
+            uiState.update {
+                it.copy(ocupacionesList = lista)
             }
         }
     }
